@@ -1,6 +1,8 @@
 from tkinter import *
 from PIL import Image, ImageTk
 import numpy as np
+import random
+from Stack import Stack
 
 class Window(Frame):
     def __init__(self, master, width = 800, height = 800):
@@ -40,10 +42,74 @@ class Window(Frame):
 
     def generate_maze(self):
         """generates the maze to the canvas"""
-        grid = self.create_grid(100,100)
-        self.display_array(grid)
-        self.canvas.configure(color = "red")
+        self.display_array(self.grid) #displaying it
+        #creating two stacks. One for columns and on for rows coordinates
+        c_stack = Stack()
+        r_stack = Stack()
+        #created a visited list, initializing the starting node, marking it True(aka visited) and adding its coordinates to each of the stacks
+        visited = np.zeros((len(self.grid), len(self.grid[0])), dtype = np.bool)
+        c = 0
+        r = 0
+        visited[r][c] = True
+        c_stack.add(c)
+        r_stack.add(r)
 
+        #starting with the starting node, then cheking its neighbors, if there are any choosing one at random.
+        #If there are not, backtraking to a node that has neightbors. (this will end once it backtracks to the starting now aka when the stack is empty)
+        while len(c_stack.stack) >= 0:
+
+            #creating the neighbors list and adding the neightbors of the node to it
+            neighbors = []
+            if c + 2 < len(self.grid[0]) and visited[r][c + 2] == False:
+                neighbors.append("right")
+            if c - 2 > 0 and visited[r][c - 2] == False:
+                neighbors.append("left")
+            if r - 2 > 0 and visited[r - 2][c] == False:
+                neighbors.append("up")
+            if r + 2 < len(self.grid) and visited[r + 2][c] == False:
+                neighbors.append("down")
+
+            # choosing a neighbor at random if there are any neighbors, displaying it, adding the coordinates to the stack, making the current node's locaions right
+            if len(neighbors) > 0:
+                choice = random.choice(neighbors)
+                if choice == "right":
+                    self.grid[r][c + 1] = [10, 206, 245]
+                    self.display_array(self.grid)
+                    c += 2
+                    visited[r][c] = True
+                    c_stack.add(c)
+                    r_stack.add(r)
+                elif choice == "left":
+                    self.grid[r][c - 1] = [10, 206, 245]
+                    self.display_array(self.grid)
+                    c -= 2
+                    visited[r][c] = True
+                    c_stack.add(c)
+                    r_stack.add(r)
+                elif choice == "up":
+                    self.grid[r - 1][c] = [10, 206, 245]
+                    self.display_array(self.grid)
+                    r -= 2
+                    visited[r][c] = True
+                    c_stack.add(c)
+                    r_stack.add(r)
+                else:
+                    self.grid[r + 1][c] = [10, 206, 245]
+                    self.display_array(self.grid)
+                    r += 2
+                    visited[r][c] = True
+                    c_stack.add(c)
+                    r_stack.add(r)
+            
+            #if there are no elements in the stack
+            elif len(c_stack.stack) == 0:
+                break
+            
+            #if there are not neighbors
+            else:
+                c = c_stack.remove()
+                r = r_stack.remove()
+            
    
     def find_path(self): 
         """finds the shortest path in the maze from the start to the end"""
@@ -57,6 +123,7 @@ class Window(Frame):
         
         self.canvas.create_image(int(self.canvas.winfo_width()/2), int(self.canvas.winfo_height()/2), image = img) #creates the canvas image
         self.canvas.image = img #puts it on the canvas
+        
 
     def set_win(self):
         """generates everything that is desplayed on the window and the functions of them"""
@@ -82,6 +149,6 @@ class Window(Frame):
         find_path.place(x = int(self.w / 2) - int(find_path.winfo_width() / 2), y = int(self.h / 50))
 
         #configuring the starting grid and displaying it on the canvas
-        grid = self.create_grid(100,100)
-        self.display_array(grid)
+        self.grid = self.create_grid(100,100)
+        self.display_array(self.grid)
         
