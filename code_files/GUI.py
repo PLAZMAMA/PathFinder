@@ -47,9 +47,11 @@ class Window(Frame):
         grid_size = simpledialog.askstring("input", "Enter the size of the maze (heightxwidth)")
         grid = self.create_grid(grid_size[:grid_size.index("x")], grid_size[grid_size.index("x"):len(grid_size)])
         self.display_array(grid) #displaying the grid
+
         #creating two stacks. One for columns and on for rows coordinates
         c_stack = Stack()
         r_stack = Stack()
+
         #created a visited list, initializing the starting node, marking it True(aka visited) and adding its coordinates to each of the stacks
         visited = np.zeros((len(grid), len(grid[0])), dtype = np.bool)
         c = 0
