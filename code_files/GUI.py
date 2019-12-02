@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import simpledialog
 from PIL import Image, ImageTk
 import numpy as np
 import random
@@ -42,12 +43,15 @@ class Window(Frame):
 
     def generate_maze(self):
         """generates the maze to the canvas"""
-        self.display_array(self.grid) #displaying it
+        #asking the user the size of the maze they want to generate and generating the starting grid with it
+        grid_size = simpledialog.askstring("input", "Enter the size of the maze (heightxwidth)")
+        grid = self.create_grid(grid_size[:grid_size.index("x")], grid_size[grid_size.index("x"):len(grid_size)])
+        self.display_array(grid) #displaying the grid
         #creating two stacks. One for columns and on for rows coordinates
         c_stack = Stack()
         r_stack = Stack()
         #created a visited list, initializing the starting node, marking it True(aka visited) and adding its coordinates to each of the stacks
-        visited = np.zeros((len(self.grid), len(self.grid[0])), dtype = np.bool)
+        visited = np.zeros((len(grid), len(grid[0])), dtype = np.bool)
         c = 0
         r = 0
         visited[r][c] = True
@@ -60,42 +64,42 @@ class Window(Frame):
 
             #creating the neighbors list and adding the neightbors of the node to it
             neighbors = []
-            if c + 2 < len(self.grid[0]) and visited[r][c + 2] == False:
+            if c + 2 < len(grid[0]) and visited[r][c + 2] == False:
                 neighbors.append("right")
             if c - 2 > 0 and visited[r][c - 2] == False:
                 neighbors.append("left")
             if r - 2 > 0 and visited[r - 2][c] == False:
                 neighbors.append("up")
-            if r + 2 < len(self.grid) and visited[r + 2][c] == False:
+            if r + 2 < len(grid) and visited[r + 2][c] == False:
                 neighbors.append("down")
 
             # choosing a neighbor at random if there are any neighbors, displaying it, adding the coordinates to the stack, making the current node's locaions right
             if len(neighbors) > 0:
                 choice = random.choice(neighbors)
                 if choice == "right":
-                    self.grid[r][c + 1] = [10, 206, 245]
-                    self.display_array(self.grid)
+                    grid[r][c + 1] = [10, 206, 245]
+                    self.display_array(grid)
                     c += 2
                     visited[r][c] = True
                     c_stack.add(c)
                     r_stack.add(r)
                 elif choice == "left":
-                    self.grid[r][c - 1] = [10, 206, 245]
-                    self.display_array(self.grid)
+                    grid[r][c - 1] = [10, 206, 245]
+                    self.display_array(grid)
                     c -= 2
                     visited[r][c] = True
                     c_stack.add(c)
                     r_stack.add(r)
                 elif choice == "up":
-                    self.grid[r - 1][c] = [10, 206, 245]
-                    self.display_array(self.grid)
+                    grid[r - 1][c] = [10, 206, 245]
+                    self.display_array(grid)
                     r -= 2
                     visited[r][c] = True
                     c_stack.add(c)
                     r_stack.add(r)
                 else:
-                    self.grid[r + 1][c] = [10, 206, 245]
-                    self.display_array(self.grid)
+                    grid[r + 1][c] = [10, 206, 245]
+                    self.display_array(grid)
                     r += 2
                     visited[r][c] = True
                     c_stack.add(c)
@@ -147,8 +151,4 @@ class Window(Frame):
         self.canvas.place(x = int(self.w/100), y = int(self.h / 5))
         generate_maze.place(x = int(self.w / 50) , y = int(self.h / 50))
         find_path.place(x = int(self.w / 2) - int(find_path.winfo_width() / 2), y = int(self.h / 50))
-
-        #configuring the starting grid and displaying it on the canvas
-        self.grid = self.create_grid(100,100)
-        self.display_array(self.grid)
         
