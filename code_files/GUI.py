@@ -45,7 +45,7 @@ class Window(Frame):
         """generates the maze to the canvas"""
         #asking the user the size of the maze they want to generate and generating the starting grid with it
         grid_size = simpledialog.askstring("input", "Enter the size of the maze (heightxwidth)")
-        grid = self.create_grid(grid_size[:grid_size.index("x")], grid_size[grid_size.index("x"):len(grid_size)])
+        grid = self.create_grid(int(grid_size[:grid_size.index("x")]), int(grid_size[grid_size.index("x") + 1:len(grid_size)]))
         self.display_array(grid) #displaying the grid
 
         #creating two stacks. One for columns and on for rows coordinates
