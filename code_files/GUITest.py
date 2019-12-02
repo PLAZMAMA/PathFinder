@@ -9,6 +9,7 @@ class GUITest(TestCase):
        self.app.set_win()
 
     def test_create_grid(self):
+        """tests the create grid method of the GUI class"""
         expected = [[10, 206, 245], [0, 0, 0], [10, 206, 245], [0, 0, 0], [10, 206, 245], 
                     [10, 206, 245], [0, 0, 0], [10, 206, 245], [0, 0, 0], [10, 206, 245],
                     [10, 206, 245], [0, 0, 0], [10, 206, 245], [0, 0, 0], [10, 206, 245]]
