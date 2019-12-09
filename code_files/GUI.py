@@ -3,6 +3,7 @@ from tkinter import simpledialog
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import numpy as np
+from Maze import Maze
 
 class Window(Frame):
     def __init__(self, master, width = 800, height = 800):
@@ -17,6 +18,9 @@ class Window(Frame):
         #asking the user the size of the maze they want to generate and generating the starting grid with it
         self.grid_size = simpledialog.askstring("input", "Enter the size of the maze (heightxwidth / rowsxcolumns)")
         self.grid_size = [int(self.grid_size[:self.grid_size.index("x")]), int(self.grid_size[self.grid_size.index("x") + 1:])]
+        self.maze = Maze(self.grid_size)
+        self.maze.generate_maze()
+        self.display_array(self.maze.grid)
 
         
 
@@ -36,22 +40,29 @@ class Window(Frame):
 
     def find_path(self): 
         """finds the shortest path in the maze from the start to the end"""
+        #making sure the maze was created before finding the path
+        try:
+            self.maze
+        except:
+            messagebox.showerror("error", "maze was not created")
+
         #getting the start and end locations until inputed correctly(from the instructions that are given in the message)
         s_inpt = simpledialog.askstring("input", "which corner of the maze would you like to start from? (top-left, top-right, buttom-left, buttom-right)")
         e_inpt = simpledialog.askstring("input", "which corner of the maze would you like to end at? (top-left, top-right, buttom-left, buttom-right)")
         s = self.get_inpt_location(s_inpt)
         e = self.get_inpt_location(e_inpt)
-        while s == -1 and e == -1:
+        if s == -1 or e == -1:
             messagebox.showerror("error", "wrong input was given")
-            s_inpt = simpledialog.askstring("input", "which corner of the maze would you like to start from? (top-left, top-right, buttom-left, buttom-right)")
-            e_inpt = simpledialog.askstring("input", "which corner of the maze would you like to end at? (top-left, top-right, buttom-left, buttom-right)")
-            s = self.get_inpt_location(s_inpt)
-            e = self.get_inpt_location(e_inpt)
-        
-
-
-       
             
+        else:
+            #finding the path, if it was able to reach the end and displaying it
+            reached_end = self.maze.find_path(s, e)
+
+            if reached_end:
+                self.display_array(self.maze.grid)
+            else:
+                messagebox.showinfo("path info", "end was not reachable from the starting location")
+                
 
     def display_array(self, array):
         """displayes a given array on the canvas"""
