@@ -8,6 +8,7 @@ class Maze():
         self.grid_size = size
         self.grid_size[0] = self.grid_size[0] * 2 - 1 
         self.grid_size[1] = self.grid_size[1] * 2 - 1
+
         #generates the grid with black walls in between each blue cell
         #creates the output array with the corrected sizes
         self.grid = np.zeros((self.grid_size[0], self.grid_size[1], 3), dtype = np.int32)
@@ -23,9 +24,24 @@ class Maze():
             else:
                 for c in range(self.grid_size[1]):
                     self.grid[r][c] = [0, 0, 0]
+    
+    def get_neighbors(self, r, c, visited):
+        """return the unvisited neightbors given the row, column of the neighbors and the current visited array"""
+        neighbors = []
+        if c + 2 < self.grid_size[1] and visited[r][c + 2] == False:
+            neighbors.append("right")
+        if c - 2 > 0 and visited[r][c - 2] == False:
+            neighbors.append("left")
+        if r - 2 > 0 and visited[r - 2][c] == False:
+            neighbors.append("up")
+        if r + 2 < self.grid_size[0] and visited[r + 2][c] == False:
+            neighbors.append("down")
+        
+        return(neighbors)
         
     
     def generate_maze(self):
+        """generates a maze into the grid"""
         #creating two stacks. One for columns and on for rows coordinates
         c_stack = Stack()
         r_stack = Stack()
@@ -42,15 +58,7 @@ class Maze():
         #If there are not, backtraking to a node that has neightbors. (this will end once it backtracks to the starting now aka when the stack is empty)
         while len(c_stack.stack) >= 0:
             #creating the neighbors list and adding the neightbors of the node to it
-            neighbors = []
-            if c + 2 < self.grid_size[1] and visited[r][c + 2] == False:
-                neighbors.append("right")
-            if c - 2 > 0 and visited[r][c - 2] == False:
-                neighbors.append("left")
-            if r - 2 > 0 and visited[r - 2][c] == False:
-                neighbors.append("up")
-            if r + 2 < self.grid_size[0] and visited[r + 2][c] == False:
-                neighbors.append("down")
+            neighbors = self.get_neighbors(r, c, visited)
 
             # choosing a neighbor at random if there are any neighbors, displaying it, adding the coordinates to the stack, making the current node's locaions right
             if len(neighbors) > 0:
@@ -101,7 +109,9 @@ class Maze():
             for _ in range(size[0]):
                 l.append(self.create_list(size[1:], val))
             return(l)
+
     def find_path(self, s, e):
+        """finds the path from s to e and updates the grid with the found path and returns if it was able to reach the end"""
         #initializing the queues
         rq = Queue()
         cq = Queue()
@@ -136,34 +146,32 @@ class Maze():
                 rq.add(r)
                 cq.add(c + 2)
                 visited[r][c + 2] = True
-                prev[r][c + 1][0] = r
-                prev[r][c + 1][1] = c
-                prev[r][c + 2][0] = r
-                prev[r][c + 2][1] = c + 1
+                prev[r][c + 1] = [r, c]
+                prev[r][c + 2] = [r, c + 1]
             if c - 2 >= 0 and np.all(self.grid[r][c - 1] == [10, 206, 245]) and visited[r][c - 2] == False:
                 rq.add(r)
                 cq.add(c - 2)
                 visited[r][c - 2] = True
-                prev[r][c - 1][0] = r
-                prev[r][c - 1][1] = c
-                prev[r][c - 2][0] = r
-                prev[r][c - 2][1] = c - 1
+                prev[r][c - 1] = [r, c]
+                prev[r][c - 2] = [r, c - 1]
             if r - 2 >= 0 and np.all(self.grid[r - 1][c] == [10, 206, 245]) and visited[r - 2][c] == False:
                 rq.add(r - 2)
                 cq.add(c)
                 visited[r - 2][c] = True
-                prev[r - 1][c][0] = r
-                prev[r - 1][c][1] = c
-                prev[r - 2][c][0] = r - 1
-                prev[r - 2][c][1] = c
+                prev[r - 1][c] = [r, c]
+                prev[r - 2][c] = [r - 1, c]
             if r + 2 < self.grid_size[0] and np.all(self.grid[r + 1][c] == [10, 206, 245]) and visited[r + 2][c] == False:
                 rq.add(r + 2)
                 cq.add(c)
                 visited[r + 2][c] = True
-                prev[r + 1][c][0] = r
-                prev[r + 1][c][1] = c
-                prev[r + 2][c][0] = r + 1
-                prev[r + 2][c][1] = c
+                prev[r + 1][c] = [r, c]
+                prev[r + 2][c] = [r + 1, c]
+        
+        self.create_path(prev, e, reached_end)
+        return(reached_end)
+
+    def create_path(self, prev, e, reached_end):
+        """creates the path from the given prev and end point"""
 
         #initialzing path(used for storing the path) and at (used as a pointer) which starts at the end coordinates
         path = []
@@ -177,7 +185,3 @@ class Maze():
         if reached_end:
             for coordinate in path:
                 self.grid[coordinate[0]][coordinate[1]] = [0, 153, 0]
-            self.display_array(self.grid)
-
-        else:
-            messagebox.showinfo("info", "path does not exist between the start and the end")
