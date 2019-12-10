@@ -1,5 +1,5 @@
 # PathFinder
-find the shortest path of a random generated maze using breadth first search
+find the shortest path of a random generated maze using breadth first search(the how to use is at the buttom of the page)
 
 ![alt text](https://github.com/PLAZMAMA/PathFinder/blob/master/imgs/maze_img_1.png)
 ![alt text](https://github.com/PLAZMAMA/PathFinder/blob/master/imgs/maze_img_2.png)
